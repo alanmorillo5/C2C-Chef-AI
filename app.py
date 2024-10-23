@@ -29,26 +29,56 @@ def chat():
     if 'conversation' not in session:
         session['conversation'] = []
 
+    # Append the user's message to the conversation
     session['conversation'].append({"role": "user", "content": user_message})
 
-    system_message = f"The user is showing a picture of a {animal_type}. Respond accordingly."
+    # Read the initial prompt from the file
+    text_file_path = 'topic_prompts/chef_directive.txt'
+    if not os.path.exists(text_file_path):
+        return jsonify({'response': 'Initial prompt file not found.'})
+
+    with open(text_file_path, 'r') as file:
+        initial_prompt = file.read()
+
+    # Construct the system message
+    system_message = f"The user is showing a picture of a {animal_type}. Respond accordingly"
+
+    # The messages structure for the API call
     messages = [{
+        "role": "system",
+        "content": initial_prompt
+    }, {
         "role": "system",
         "content": system_message
     }] + session['conversation']
 
     try:
-        # Make a request to OpenAI API
+        # Make API call to OpenAI using the messages
         response = openai.chat.completions.create(model="gpt-3.5-turbo-1106",
                                                   messages=messages)
+        # Extract the content from the response
         gpt_response = response.choices[0].message.content
+
+        # Append the GPT response to the conversation history
         session['conversation'].append({
             "role": "assistant",
             "content": gpt_response
         })
+
+        # Return the GPT response
         return jsonify({'response': gpt_response})
     except Exception as e:
+        # Log the error and return a message
+        app.logger.error(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+# Clear session route
+@app.route('/clear_session', methods=['GET'])
+def clear_session():
+    # Clear the session
+    session.clear()
+    return jsonify({'status': 'session cleared'})
 
 
 if __name__ == '__main__':
