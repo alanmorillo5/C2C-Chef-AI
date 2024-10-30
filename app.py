@@ -41,7 +41,7 @@ def chat():
         initial_prompt = file.read()
 
     # Construct the system message
-    system_message = f"The user is showing a picture of a {Ingredients}. Respond accordingly"
+    system_message = f"The user has scanned the following ingredients: {', '.join(Ingredients)}. Suggest recipes that primarily use these ingredients."
 
     # The messages structure for the API call
     messages = [{

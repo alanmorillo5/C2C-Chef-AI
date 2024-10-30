@@ -35,13 +35,20 @@ async function loop() {
 }
 
 // Predict function
+let lastDetected = {}; // Track last detection timestamps
 async function predict() {
     const prediction = await model.predict(webcam.canvas);
+    const currentTime = Date.now();
     for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+        const { className, probability } = prediction[i];
+        const classPrediction = `${className}: ${probability.toFixed(2)}`;
         labelContainer.childNodes[i].innerHTML = classPrediction;
-        if (prediction[i].probability > 0.05) {
-            ListOfIngredients.push(prediction[i].className);
+
+        if (probability > 0.2 && (!lastDetected[className] || currentTime - lastDetected[className] > 1000)) {
+            if (!ListOfIngredients.includes(className)) {
+                ListOfIngredients.push(className);
+            }
+            lastDetected[className] = currentTime; // Update detection timestamp
         }
     }
 }
@@ -60,7 +67,7 @@ function sendMessage() {
         },
         body: JSON.stringify({
             message: userInput,
-            Ingredients: ListOfIngredients
+            Ingredients: getUniqueIngredients()
         }),
     })
     .then(response => response.json())
@@ -72,6 +79,10 @@ function sendMessage() {
     });
 
     document.getElementById("user-input").value = "";
+}
+
+function getUniqueIngredients() {
+    return [...new Set(ListOfIngredients)];
 }
 
 // Add message to chat
