@@ -1,7 +1,7 @@
 // Teachable Machine model URL
-const URL = "https://teachablemachine.withgoogle.com/models/-q6hHNGve/";
+const URL = "https://teachablemachine.withgoogle.com/models/UJ-6ZpJR6/";
 let model, webcam, labelContainer, maxPredictions;
-let currentAnimal = "";
+let ListOfIngredients = [];
 
 // Initialize webcam and model
 async function init() {
@@ -40,8 +40,8 @@ async function predict() {
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
         labelContainer.childNodes[i].innerHTML = classPrediction;
-        if (prediction[i].probability > 0.5) {
-            currentAnimal = prediction[i].className;
+        if (prediction[i].probability > 0.05) {
+            ListOfIngredients.push(prediction[i].className);
         }
     }
 }
@@ -60,7 +60,7 @@ function sendMessage() {
         },
         body: JSON.stringify({
             message: userInput,
-            animalType: currentAnimal
+            Ingredients: ListOfIngredients
         }),
     })
     .then(response => response.json())

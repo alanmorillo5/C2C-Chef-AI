@@ -24,7 +24,7 @@ def home():
 @app.route('/chat', methods=['POST'])
 def chat():
     user_message = request.json['message']
-    animal_type = request.json['animalType']
+    Ingredients = request.json['Ingredients']
 
     if 'conversation' not in session:
         session['conversation'] = []
@@ -41,7 +41,7 @@ def chat():
         initial_prompt = file.read()
 
     # Construct the system message
-    system_message = f"The user is showing a picture of a {animal_type}. Respond accordingly"
+    system_message = f"The user is showing a picture of a {Ingredients}. Respond accordingly"
 
     # The messages structure for the API call
     messages = [{
