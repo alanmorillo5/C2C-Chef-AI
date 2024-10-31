@@ -6,7 +6,9 @@ import random
 # Establish connection to MySQL database
 def connect_to_database():
     try:
-        mydb = mysql.connector.connect(host="localhost", user="root", password="XXXXXX")
+        mydb = mysql.connector.connect(
+            host="localhost", user="root", password="XXXXXXX"
+        )
         print("Connected to the database\n")
         return mydb
     except mysql.connector.Error as err:
